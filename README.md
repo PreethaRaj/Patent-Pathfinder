@@ -98,33 +98,31 @@ It performs:
 
 ```mermaid
 flowchart TD
-
-A[User Input Idea] --> B[Frontend - Next.js]
-B --> C[Backend Orchestrator - FastAPI]
-
-C --> D1[MCP Retrieval Service]
-D1 --> D2[Lens.org API]
-D1 --> D3[Google Patents Fallback]
-
-D2 --> E[Patent Results]
-D3 --> E
-
-E --> F[Jina Embeddings Vectorization]
-
-F --> G[MCP Evidence Service]
-G --> H[Feature-to-Passage Mapping]
-
-H --> I[MCP Novelty Service]
-I --> J[Overlap + Saturation Analysis]
-
-J --> K[LLM - Llama 3.2]
-K --> L[Innovation Delta Generation]
-
-L --> M[MCP Report Service]
-M --> N[Structured Innovation Report]
-
-N --> O[Frontend Visualization]
-
+    A["User Input Idea"] --> B["Frontend - Next.js"]
+    B --> C["Backend Orchestrator - FastAPI"]
+    
+    C --> D1["MCP Retrieval Service"]
+    D1 --> D2["Lens.org API"]
+    D1 --> D3["Google Patents Fallback"]
+    
+    D2 --> E["Patent Results"]
+    D3 --> E
+    
+    E --> F["Jina Embeddings Vectorization"]
+    F --> G["MCP Evidence Service"]
+    G --> H["Feature-to-Passage Mapping"]
+    
+    H --> I["MCP Novelty Service"]
+    I --> J["Overlap + Saturation Analysis"]
+    
+    J --> K["LLM - Llama 3.2"]
+    K --> L["Innovation Delta Generation"]
+    
+    L --> M["MCP Report Service"]
+    M --> N["Structured Innovation Report"]
+    
+    N --> O["Frontend Visualization"]
+```
 
 ⚙️ Setup & Execution
 
