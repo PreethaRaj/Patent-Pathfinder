@@ -1,0 +1,57 @@
+nameOverride: ""
+fullnameOverride: ""
+
+namespace: innovation
+
+backend:
+  image:
+    repository: intelligent-innovation-copilot/backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 8000
+
+frontend:
+  image:
+    repository: intelligent-innovation-copilot/frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 3000
+
+mcp:
+  image:
+    repository: intelligent-innovation-copilot/backend
+    tag: latest
+    pullPolicy: IfNotPresent
+
+postgres:
+  host: postgres
+  port: 5432
+  database: innovation
+  username: innovation
+  password: innovation
+
+redis:
+  host: redis
+  port: 6379
+
+opensearch:
+  url: http://opensearch:9200
+
+neo4j:
+  url: bolt://neo4j:7687
+  username: neo4j
+  password: neo4jpassword
+
+jwt:
+  secret: change-me
+
+ingress:
+  enabled: false
+  className: nginx
+  host: innovation.local

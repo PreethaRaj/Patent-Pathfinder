@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-ingestion
+  namespace: innovation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-ingestion
+  template:
+    metadata:
+      labels:
+        app: mcp-ingestion
+    spec:
+      containers:
+        - name: mcp-ingestion
+          image: intelligent-innovation-copilot/mcp-ingestion:latest
+          ports:
+            - containerPort: 8102
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-ingestion
+  namespace: innovation
+spec:
+  selector:
+    app: mcp-ingestion
+  ports:
+    - port: 8102
+      targetPort: 8102

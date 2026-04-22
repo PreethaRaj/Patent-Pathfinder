@@ -1,0 +1,4 @@
+[wsl2]
+memory=16GB      # Total RAM for ALL WSL + Docker
+processors=8     # CPU cores
+swap=4GB

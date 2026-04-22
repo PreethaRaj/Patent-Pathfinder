@@ -1,0 +1,236 @@
+x-common-env: &common-env
+  env_file:
+    - .env
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: innovation
+      POSTGRES_USER: innovation
+      POSTGRES_PASSWORD: innovation
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U innovation -d innovation"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8.0-rc1
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  opensearch:
+    image: opensearchproject/opensearch:2.17.1
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      OPENSEARCH_JAVA_OPTS: -Xms1g -Xmx1g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200 >/dev/null || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 15
+
+  neo4j:
+    image: neo4j:5.22-community
+    environment:
+      NEO4J_AUTH: neo4j/neo4jpassword
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 >/dev/null || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 15
+
+  ollama:
+    image: ollama/ollama:0.3.14
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:11434/api/tags >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+
+  vllm:
+    image: vllm/vllm-openai:latest
+    profiles: ["gpu"]
+    command: ["--model", "meta-llama/Llama-3.1-70B-Instruct", "--served-model-name", "llama3.1"]
+    environment:
+      HUGGING_FACE_HUB_TOKEN: ""
+    ports:
+      - "8001:8000"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    <<: *common-env
+    working_dir: /app
+    command: ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    volumes:
+      - ./:/app
+      - reports_data:/tmp/innovation_reports
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    ports:
+      - "9000:8000"
+
+  frontend:
+    image: node:22-bookworm-slim
+    working_dir: /app/frontend
+    <<: *common-env
+    command: >
+      sh -c "if [ ! -d node_modules ] || [ ! -f node_modules/.package-lock-ready ]; then
+      npm install &&
+      touch node_modules/.package-lock-ready;
+      fi &&
+      npm run dev"
+    volumes:
+      - ./frontend:/app/frontend
+      - frontend_node_modules:/app/frontend/node_modules
+      - frontend_next:/app/frontend/.next
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "3186:3000"
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    <<: *common-env
+    working_dir: /app
+    command: ["celery", "-A", "backend.app.worker.celery_app", "worker", "--loglevel=INFO"]
+    volumes:
+      - ./:/app
+      - reports_data:/tmp/innovation_reports
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  mcp_retrieval:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    <<: *common-env
+    working_dir: /app
+    command: ["uvicorn", "backend.mcp_servers.retrieval.server:app", "--host", "0.0.0.0", "--port", "8101"]
+    ports:
+      - "8101:8101"
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+  mcp_ingestion:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    <<: *common-env
+    working_dir: /app
+    command: ["uvicorn", "backend.mcp_servers.ingestion.server:app", "--host", "0.0.0.0", "--port", "8102"]
+    ports:
+      - "8102:8102"
+    depends_on:
+      opensearch:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  mcp_evidence:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    <<: *common-env
+    working_dir: /app
+    command: ["uvicorn", "backend.mcp_servers.evidence.server:app", "--host", "0.0.0.0", "--port", "8103"]
+    ports:
+      - "8103:8103"
+
+  mcp_novelty:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    <<: *common-env
+    working_dir: /app
+    command: ["uvicorn", "backend.mcp_servers.novelty.server:app", "--host", "0.0.0.0", "--port", "8104"]
+    ports:
+      - "8104:8104"
+
+  mcp_monitoring:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    <<: *common-env
+    working_dir: /app
+    command: ["uvicorn", "backend.mcp_servers.monitoring.server:app", "--host", "0.0.0.0", "--port", "8105"]
+    ports:
+      - "8105:8105"
+
+  mcp_report:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    <<: *common-env
+    working_dir: /app
+    command: ["uvicorn", "backend.mcp_servers.report.server:app", "--host", "0.0.0.0", "--port", "8106"]
+    ports:
+      - "8106:8106"
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    volumes:
+      - ./infra/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    ports:
+      - "3191:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+
+volumes:
+  postgres_data:
+  neo4j_data:
+  ollama_data:
+  frontend_node_modules:
+  frontend_next:
+  reports_data:

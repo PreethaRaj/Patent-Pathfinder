@@ -1,0 +1,38 @@
+{{- $root := . -}}
+{{- range $name, $port := dict "retrieval" 8101 "ingestion" 8102 "evidence" 8103 "novelty" 8104 "monitoring" 8105 "report" 8106 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "intelligent-innovation-copilot.fullname" $root }}-mcp-{{ $name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "intelligent-innovation-copilot.name" $root }}
+      app.kubernetes.io/component: mcp-{{ $name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "intelligent-innovation-copilot.name" $root }}
+        app.kubernetes.io/component: mcp-{{ $name }}
+    spec:
+      containers:
+        - name: mcp-{{ $name }}
+          image: "{{ $root.Values.mcp.image.repository }}:{{ $root.Values.mcp.image.tag }}"
+          imagePullPolicy: {{ $root.Values.mcp.image.pullPolicy }}
+          ports:
+            - containerPort: {{ $port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "intelligent-innovation-copilot.fullname" $root }}-mcp-{{ $name }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ include "intelligent-innovation-copilot.name" $root }}
+    app.kubernetes.io/component: mcp-{{ $name }}
+  ports:
+    - port: {{ $port }}
+      targetPort: {{ $port }}
+{{- end }}

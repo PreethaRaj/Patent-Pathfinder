@@ -1,0 +1,57 @@
+{
+  "idea_title": "Warehouse Stockout Prediction",
+  "input_text": "I want an AI system that predicts warehouse stockouts using camera feeds from shelves and ERP inventory signals. The model should alert managers when a shelf is empty before the ERP catches up.",
+  "decomposed_features": [
+    {
+      "id": "F1",
+      "name": "Camera-based shelf monitoring",
+      "novelty_label": "moderately_covered"
+    },
+    {
+      "id": "F2",
+      "name": "ERP inventory signal integration",
+      "novelty_label": "heavily_covered"
+    },
+    {
+      "id": "F3",
+      "name": "Stockout prediction model",
+      "novelty_label": "crowded"
+    },
+    {
+      "id": "F4",
+      "name": "Pre-ERP alerting based on temporal lag between shelf state and ERP updates",
+      "novelty_label": "low_coverage"
+    }
+  ],
+  "top_prior_art": [
+    {
+      "publication_number": "US11514409B2",
+      "title": "Shelf monitoring with computer vision",
+      "evidence": [
+        "claims 1-5"
+      ]
+    },
+    {
+      "publication_number": "EP3982345A1",
+      "title": "Inventory prediction using ERP and sensors",
+      "evidence": [
+        "paragraphs 45-67"
+      ]
+    }
+  ],
+  "novelty_map": {
+    "high_saturation": [
+      "F1",
+      "F2",
+      "F3"
+    ],
+    "potential_hotspots": [
+      "F4"
+    ]
+  },
+  "redesign_suggestions": [
+    "Focus on camera + ERP temporal lag prediction.",
+    "Add explicit edge-device deployment constraints.",
+    "Explore multi-modal fusion with audio or weight sensors."
+  ]
+}

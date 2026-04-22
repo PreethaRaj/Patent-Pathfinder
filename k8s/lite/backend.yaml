@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: backend }
+  template:
+    metadata:
+      labels: { app: backend }
+    spec:
+      containers:
+        - name: backend
+          image: intelligent-innovation-copilot/backend:lite
+          ports:
+            - containerPort: 8000
+          env:
+            - { name: APP_EDITION, value: "lite" }
+            - { name: ENVIRONMENT, value: "production" }
+            - { name: LLM_PROVIDER, value: "ollama" }
+            - { name: OLLAMA_BASE_URL, value: "http://ollama:11434" }
+            - { name: OLLAMA_CHAT_MODEL, value: "qwen2.5:7b-instruct" }
+            - { name: EMBEDDING_MODEL, value: "nomic-embed-text" }
+            - { name: DATABASE_URL, value: "postgresql+psycopg://innovation:innovation@postgres:5432/innovation" }
+            - { name: OPENSEARCH_URL, value: "http://opensearch:9200" }
+            - { name: REDIS_URL, value: "redis://redis:6379/0" }
+          envFrom:
+            - secretRef: { name: innovation-secrets }
+          resources:
+            requests: { cpu: "250m", memory: "512Mi" }
+            limits: { cpu: "1000m", memory: "1Gi" }
+          readinessProbe:
+            httpGet: { path: /readyz, port: 8000 }
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8000 }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector: { app: backend }
+  ports:
+    - port: 8000
+      targetPort: 8000

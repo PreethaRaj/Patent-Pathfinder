@@ -1,0 +1,163 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1000"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  postgres:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U innovation -d innovation"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  opensearch:
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+      bootstrap.memory_lock: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200 >/dev/null || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+  neo4j:
+    environment:
+      NEO4J_AUTH: neo4j/neo4jpassword
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 512m
+      NEO4J_server_memory_pagecache_size: 256m
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+  ollama:
+    profiles: []
+    environment:
+      OLLAMA_NUM_PARALLEL: ${OLLAMA_NUM_PARALLEL:-2}
+      OLLAMA_MAX_LOADED_MODELS: ${OLLAMA_MAX_LOADED_MODELS:-1}
+      OLLAMA_KEEP_ALIVE: 10m
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:11434/api/tags >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    environment:
+      APP_EDITION: ${APP_EDITION:-lite}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  frontend:
+    environment:
+      NODE_ENV: production
+    command: ["bash", "-lc", "npm install && npm run build && npm run start"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000 >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  celery-worker:
+    environment:
+      APP_EDITION: ${APP_EDITION:-lite}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mcp_retrieval:
+    environment:
+      APP_EDITION: ${APP_EDITION:-lite}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8101/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  mcp_ingestion:
+    environment:
+      APP_EDITION: ${APP_EDITION:-lite}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8102/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  mcp_evidence:
+    environment:
+      APP_EDITION: ${APP_EDITION:-lite}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8103/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  mcp_novelty:
+    environment:
+      APP_EDITION: ${APP_EDITION:-lite}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8104/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  mcp_monitoring:
+    environment:
+      APP_EDITION: ${APP_EDITION:-lite}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8105/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  mcp_report:
+    environment:
+      APP_EDITION: ${APP_EDITION:-lite}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8106/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped

@@ -1,0 +1,32 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: backend
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["backend:8000"]
+
+  - job_name: mcp_retrieval
+    static_configs:
+      - targets: ["mcp_retrieval:8101"]
+
+  - job_name: mcp_ingestion
+    static_configs:
+      - targets: ["mcp_ingestion:8102"]
+
+  - job_name: mcp_evidence
+    static_configs:
+      - targets: ["mcp_evidence:8103"]
+
+  - job_name: mcp_novelty
+    static_configs:
+      - targets: ["mcp_novelty:8104"]
+
+  - job_name: mcp_monitoring
+    static_configs:
+      - targets: ["mcp_monitoring:8105"]
+
+  - job_name: mcp_report
+    static_configs:
+      - targets: ["mcp_report:8106"]

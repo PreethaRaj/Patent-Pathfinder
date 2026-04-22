@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-monitoring
+  namespace: innovation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-monitoring
+  template:
+    metadata:
+      labels:
+        app: mcp-monitoring
+    spec:
+      containers:
+        - name: mcp-monitoring
+          image: intelligent-innovation-copilot/mcp-monitoring:latest
+          ports:
+            - containerPort: 8105
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-monitoring
+  namespace: innovation
+spec:
+  selector:
+    app: mcp-monitoring
+  ports:
+    - port: 8105
+      targetPort: 8105

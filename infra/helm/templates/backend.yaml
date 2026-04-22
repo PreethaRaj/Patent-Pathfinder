@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "intelligent-innovation-copilot.fullname" . }}-backend
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "intelligent-innovation-copilot.name" . }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "intelligent-innovation-copilot.name" . }}
+        app.kubernetes.io/component: backend
+    spec:
+      containers:
+        - name: backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: postgresql+psycopg://{{ .Values.postgres.username }}:{{ .Values.postgres.password }}@{{ .Values.postgres.host }}:{{ .Values.postgres.port }}/{{ .Values.postgres.database }}
+            - name: REDIS_URL
+              value: redis://{{ .Values.redis.host }}:{{ .Values.redis.port }}/0
+            - name: OPENSEARCH_URL
+              value: {{ .Values.opensearch.url | quote }}
+            - name: NEO4J_URL
+              value: {{ .Values.neo4j.url | quote }}
+            - name: NEO4J_USERNAME
+              value: {{ .Values.neo4j.username | quote }}
+            - name: NEO4J_PASSWORD
+              value: {{ .Values.neo4j.password | quote }}
+            - name: JWT_SECRET
+              value: {{ .Values.jwt.secret | quote }}
+            - name: MCP_RETRIEVAL_URL
+              value: http://{{ include "intelligent-innovation-copilot.fullname" . }}-mcp-retrieval:8101
+            - name: MCP_INGESTION_URL
+              value: http://{{ include "intelligent-innovation-copilot.fullname" . }}-mcp-ingestion:8102
+            - name: MCP_EVIDENCE_URL
+              value: http://{{ include "intelligent-innovation-copilot.fullname" . }}-mcp-evidence:8103
+            - name: MCP_NOVELTY_URL
+              value: http://{{ include "intelligent-innovation-copilot.fullname" . }}-mcp-novelty:8104
+            - name: MCP_MONITORING_URL
+              value: http://{{ include "intelligent-innovation-copilot.fullname" . }}-mcp-monitoring:8105
+            - name: MCP_REPORT_URL
+              value: http://{{ include "intelligent-innovation-copilot.fullname" . }}-mcp-report:8106
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "intelligent-innovation-copilot.fullname" . }}-backend
+spec:
+  type: {{ .Values.backend.service.type }}
+  selector:
+    app.kubernetes.io/name: {{ include "intelligent-innovation-copilot.name" . }}
+    app.kubernetes.io/component: backend
+  ports:
+    - port: {{ .Values.backend.service.port }}
+      targetPort: 8000

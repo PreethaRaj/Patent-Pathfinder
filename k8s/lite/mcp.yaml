@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-retrieval
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: mcp-retrieval }
+  template:
+    metadata:
+      labels: { app: mcp-retrieval }
+    spec:
+      containers:
+        - name: mcp-retrieval
+          image: intelligent-innovation-copilot/backend:lite
+          command: ["uvicorn", "backend.mcp_servers.retrieval.server:app", "--host", "0.0.0.0", "--port", "8101"]
+          ports:
+            - containerPort: 8101
+          resources:
+            requests: { cpu: "100m", memory: "256Mi" }
+            limits: { cpu: "500m", memory: "512Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-retrieval
+spec:
+  selector: { app: mcp-retrieval }
+  ports:
+    - port: 8101
+      targetPort: 8101

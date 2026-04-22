@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-report
+  namespace: innovation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-report
+  template:
+    metadata:
+      labels:
+        app: mcp-report
+    spec:
+      containers:
+        - name: mcp-report
+          image: intelligent-innovation-copilot/mcp-report:latest
+          ports:
+            - containerPort: 8106
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-report
+  namespace: innovation
+spec:
+  selector:
+    app: mcp-report
+  ports:
+    - port: 8106
+      targetPort: 8106

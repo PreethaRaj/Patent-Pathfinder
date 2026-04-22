@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-novelty
+  namespace: innovation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-novelty
+  template:
+    metadata:
+      labels:
+        app: mcp-novelty
+    spec:
+      containers:
+        - name: mcp-novelty
+          image: intelligent-innovation-copilot/mcp-novelty:latest
+          ports:
+            - containerPort: 8104
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-novelty
+  namespace: innovation
+spec:
+  selector:
+    app: mcp-novelty
+  ports:
+    - port: 8104
+      targetPort: 8104

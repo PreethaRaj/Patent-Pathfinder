@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-evidence
+  namespace: innovation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-evidence
+  template:
+    metadata:
+      labels:
+        app: mcp-evidence
+    spec:
+      containers:
+        - name: mcp-evidence
+          image: intelligent-innovation-copilot/mcp-evidence:latest
+          ports:
+            - containerPort: 8103
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-evidence
+  namespace: innovation
+spec:
+  selector:
+    app: mcp-evidence
+  ports:
+    - port: 8103
+      targetPort: 8103
