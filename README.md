@@ -124,7 +124,7 @@ flowchart TD
     N --> O["Frontend Visualization"]
 ```
 
-⚙️ Setup & Execution
+## ⚙️ Setup & Execution
 
 ⚠️ Prerequisite
 
@@ -139,15 +139,10 @@ cd innovation-copilot
 run_all.bat (run the batch file in command prompt/powershell)
 
 Access:
-
-UI → After it starts
-
-Open browser:
-
-http://127.0.0.1:5006/idea-input
-
+Open browser: http://127.0.0.1:5006/idea-input
 
 🧪 How to Use
+
 1️⃣ Submit Concept
 
 Enter your idea in natural language
@@ -155,20 +150,16 @@ Enter your idea in natural language
 2️⃣ Semantic Analysis
 
 System performs:
+Patent retrieval, Feature extraction, Evidence mapping
 
-Patent retrieval
-Feature extraction
-Evidence mapping
 3️⃣ Review Innovation Report
 
 You get:
+Feature decomposition, Prior art mapping, Novelty map, CPC codes
 
-Feature decomposition
-Prior art mapping
-Novelty map
-CPC codes
 🚀 Innovation Deltas
 📌 Example Scenario
+
 🧾 Input
 
 Idea title: AI Food Expiry Tracker
@@ -178,7 +169,6 @@ Objectives: Reduce food waste, expiry alerts, recipe suggestions from near-expir
 Constraints: Works with standard phone camera, no smart fridge required, offline inference
 Tags: computer-vision, food-waste, edge-AI, smart-home
 
-
 📊 Output
 
 Existing Coverage & 
@@ -186,11 +176,10 @@ Existing Coverage &
 1. Emphasize ai food expiry tracker as the likely differentiator.
 2. Describe implementation constraints for ai food expiry tracker more concretely.
 
-
 🎯 Result: Not a search result, but a patentable direction
 
 
-Learning Guideline:
+### 🧠 Learning Guideline:
 
 💡 This project is an excellent end-to-end learning system for:
 
@@ -215,9 +204,9 @@ Based on Innovation Deltas
 Identify white-space innovation zones
 
 
-🧱 Build With Me
+## 🧱 Build With Me
 
-🚀 Let’s learn by building
+### 🚀 Let’s learn by building
 
 This project is designed as a hands-on system to understand modern AI architecture.
 
@@ -229,17 +218,12 @@ How prompting drives structured innovation
 🔪 Core Concepts Explained
 1. Agentic RAG
 
-Instead of:
+Instead of: Retrieve → Answer, 
+We do: Retrieve → Compare → Analyze → Suggest
 
-Retrieve → Answer
-
-We do:
-
-Retrieve → Compare → Analyze → Suggest
 2. MCP (Microservice Command Protocol)
 
 Each capability is a separate service:
-
 Service	Role
 Retrieval	Patent search
 Evidence	Mapping features
