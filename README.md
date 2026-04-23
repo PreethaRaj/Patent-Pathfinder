@@ -1,3 +1,4 @@
+
 # 🚀 Intelligent Innovation Copilot
 
 > **Hook:** Turn *“already patented”* ideas into **clear, actionable innovation pathways.**
@@ -8,6 +9,7 @@
 
 - 🎬 Demo 1: PatentSearchDecomposition.gif
 - 🎬 Demo 2: demo-video.gif
+- https://github.com/user-attachments/assets/01d2ef9e-605c-4024-b5ee-e014a6209f0a
 
 ---
 
