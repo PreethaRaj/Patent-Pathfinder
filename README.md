@@ -17,9 +17,7 @@
 
 There are:
 
-Known defects
-Incomplete integrations
-Areas needing optimization
+Known defects, Incomplete integrations & Areas needing optimization
 
 However, this project is an excellent end-to-end learning system.
 
@@ -179,20 +177,15 @@ Existing Coverage &
 🎯 Result: Not a search result, but a patentable direction
 
 
-### 🧠 Learning Guideline:
+## Issues & Improvements
 
-💡 This project is an excellent end-to-end learning system for:
+### 🐞 Known Issues:
 
-RAG pipelines
-Agentic architectures
-MCP-based orchestration
-AI-driven product design
-🐞 Known Issues
 Some UI sections may not populate if Lens API lacks metadata
 📄 PDF export format is incorrect 
 Occasional fallback to demo data if live retrieval fails
 
-🔮 Future Improvements
+### 🔮 Future Improvements
 1. Multi-Source Synthesis
 Add Google Patents + ArXiv
 Improve recall and coverage
@@ -211,10 +204,11 @@ Identify white-space innovation zones
 This project is designed as a hands-on system to understand modern AI architecture.
 
 🧠 What You’ll Learn
-How Agentic RAG differs from standard RAG
-How MCP enables modular AI pipelines
-How embeddings power semantic retrieval
-How prompting drives structured innovation
+1. How Agentic RAG differs from standard RAG
+2. How MCP enables modular AI pipelines
+3. How embeddings power semantic retrieval
+4. How prompting drives structured innovation
+   
 🔪 Core Concepts Explained
 1. Agentic RAG
 
@@ -223,12 +217,7 @@ We do: Retrieve → Compare → Analyze → Suggest
 
 2. MCP (Microservice Command Protocol)
 
-Each capability is a separate service:
-Service	Role
-Retrieval	Patent search
-Evidence	Mapping features
-Novelty	Overlap detection
-Report	Output generation
+Each capability is a separate service: Service	Role, Retrieval, Patent search, Evidence, Mapping features, Novelty, Overlap detection, Report & Output generation
 
 👉 Orchestrator = AI system coordinator
 
@@ -246,18 +235,16 @@ Input idea → structured features:
 
 The LLM is guided to:
 
-Identify saturation zones
-Detect gaps
-Suggest differentiation
+1. Identify saturation zones
+2. Detect gaps
+3. Suggest differentiation
 🤝 Contributing
 
 This is a learning + innovation project.
 
 If you're interested in:
 
-AI systems
-Patent intelligence
-Agentic workflows
+AI systems, Patent intelligence, Agentic workflows
 
 
 
